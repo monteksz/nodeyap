@@ -10,8 +10,8 @@ RETRIES = 60
 MAX_CONNECTIONS = 15 
 
 DOMAIN_API = {
-    "SESSION": "https://api.nodepay.org/api/auth/session",
-    "PING": "https://nw.nodepay.org/api/network/ping"
+    "SESSION": "http://18.136.143.169/api/auth/session",
+    "PING": "http://54.255.192.166/api/network/ping"
 }
 
 CONNECTION_STATES = {
