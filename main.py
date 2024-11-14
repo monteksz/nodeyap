@@ -10,7 +10,7 @@ RETRIES = 60
 MAX_CONNECTIONS = 15 
 
 DOMAIN_API = {
-    "SESSION": "http://18.136.143.169/api/auth/session",
+    "SESSION": "https://api.nodepay.ai/api/auth/session",
     "PING": "http://52.77.10.116/api/network/ping"
 }
 
