@@ -11,7 +11,11 @@ MAX_CONNECTIONS = 15
 
 DOMAIN_API = {
     "SESSION": "https://api.nodepay.ai/api/auth/session",
-    "PING": "http://13.215.134.222/api/network/ping"
+    "PING": [
+        "http://13.215.134.222/api/network/ping",
+        "http://52.77.10.116/api/network/ping",
+        "http://54.255.192.166/api/network/ping"
+    ]
 }
 
 CONNECTION_STATES = {
@@ -131,23 +135,27 @@ async def start_ping(proxy):
 async def ping(proxy):
     global RETRIES, status_connect
 
-    try:
-        data = {
-            "id": account_info.get("uid"),
-            "browser_id": browser_id,
-            "timestamp": int(time.time())
-        }
+    for url in DOMAIN_API["PING"]:
+        try:
+            data = {
+                "id": account_info.get("uid"),
+                "browser_id": browser_id,
+                "timestamp": int(time.time())
+            }
+            
+            response = call_api(url, data, proxy)
+            if response["code"] == 0:
+                logger.info(f"Ping successful via proxy {proxy} using URL {url}: {response}")
+                RETRIES = 0
+                status_connect = CONNECTION_STATES["CONNECTED"]
+                return
+            else:
+                handle_ping_fail(proxy, response)
+        except Exception as e:
+            logger.error(f"Ping failed via proxy {proxy} using URL {url}: {e}")
 
-        response = call_api(DOMAIN_API["PING"], data, proxy)
-        if response["code"] == 0:
-            logger.info(f"Ping successful via proxy {proxy}: {response}")
-            RETRIES = 0
-            status_connect = CONNECTION_STATES["CONNECTED"]
-        else:
-            handle_ping_fail(proxy, response)
-    except Exception as e:
-        logger.error(f"Ping failed via proxy {proxy}: {e}")
-        handle_ping_fail(proxy, None)
+    # If all URLs fail, increment retry count
+    handle_ping_fail(proxy, None)
 
 def handle_ping_fail(proxy, response):
     global RETRIES, status_connect
